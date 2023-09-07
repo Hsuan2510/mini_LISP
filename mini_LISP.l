@@ -1,0 +1,40 @@
+%option noyywrap
+%{
+#include <stdbool.h>
+#include "mini_LISP.tab.h"
+%}
+digit		[0-9]
+letter 	[a-z]
+%%
+[\n\t\r]+	{}
+"mod"	{return Mod;}
+"and"	{return And;}
+"or"	{return Or;}
+"not"	{return Not;}
+"define"	{return Def;}
+"if"			{return If;}
+"print-num"				{ return print_num; }
+"print-bool"				{ return print_bool; }
+"#t"	{
+			yylval.item.type=3;
+			yylval.item.bval=true;
+			return Bool_value;
+		}
+"#f"	{
+			yylval.item.type=3;
+			yylval.item.bval=false;
+			return Bool_value;
+		}
+[+*//()<>=-]		{ return yytext[0]; }
+(0|[1-9]{digit}*|-[1-9]{digit}*)	{
+										yylval.item.type=1;	//1代表int
+										yylval.item.ival=atoi(yytext);	//string 轉成 int
+										return Number;
+									}
+{letter}({letter}|{digit}|-)*	{
+									yylval.item.type=2;	//2代表ID
+									strcpy(yylval.item.string,yytext);
+									return ID;
+								}
+.	{}
+%%
